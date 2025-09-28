@@ -6,18 +6,18 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "Содержит access-токен и информацию об его сроке действия")
+@Schema(description = "Contains the access token and its expiration information")
 @Builder
 public record ResponseToken(
         @Schema(
-                description = "JWT-токен, используемый для авторизации",
+                description = "JWT token used for authorization",
                 example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         )
         @NotBlank
         String value,
 
         @Schema(
-                description = "Дата и время, когда токен истечёт",
+                description = "Date and time when the token will expire (ISO-8601 format)",
                 example = "2025-07-15T12:34:56"
         )
         @NotBlank
