@@ -25,7 +25,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-class SecurityConfig {
+public class SecurityConfig {
     private static final int BCRYPT_STRENGTH = 12;
 
     @Bean

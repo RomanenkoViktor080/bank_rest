@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,8 +40,8 @@ public class AuthController {
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "User successfully registered. " +
-                                          "Returns an access token and sets an HttpOnly cookie with the refresh token"
+                            description = "User successfully registered. "
+                                          + "Returns an access token and sets an HttpOnly cookie with the refresh token"
                     ),
                     @ApiResponse(
                             responseCode = "403",
@@ -64,8 +63,8 @@ public class AuthController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successful authentication. " +
-                                          "Returns an access token and sets an HttpOnly cookie with the refresh token"
+                            description = "Successful authentication. "
+                                          + "Returns an access token and sets an HttpOnly cookie with the refresh token"
                     ),
                     @ApiResponse(
                             responseCode = "403",
@@ -74,7 +73,6 @@ public class AuthController {
             }
     )
     @PostMapping("/login")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseToken> signIn(
             @RequestBody @Valid SignInRequest dto
     ) {
