@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,13 +24,13 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 class SecurityConfig {
     private static final int BCRYPT_STRENGTH = 12;
 
     @Bean
     public AuthenticationProvider authenticationProvider(PasswordEncoder encoder, UserDetailsService userService) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService);
         authProvider.setPasswordEncoder(encoder);
         return authProvider;
     }
@@ -63,6 +64,7 @@ class SecurityConfig {
             AuthenticationProvider authenticationProvider
     ) throws Exception {
         return http
+                .csrf(conf -> conf.disable())
                 .authorizeHttpRequests(
                         authorizeHttp -> {
                             authorizeHttp.requestMatchers(

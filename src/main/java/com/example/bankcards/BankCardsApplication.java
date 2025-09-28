@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Bean;
 public class BankCardsApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(BankCardsApplication.class, args);
+
     }
 
     @Bean
