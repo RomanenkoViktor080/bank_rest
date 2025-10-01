@@ -33,7 +33,6 @@ import java.util.UUID;
 @SQLRestriction(value = "deleted_at IS NULL")
 @Entity(name = "users")
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

@@ -25,7 +25,8 @@ spring:
 server:
   port: 8080
 
-
+hmac:
+  key: 6B3f4pJZ1aY8fR4+zTqJY1C0JQ8Fn+2kjkFq8R9bN7g=
 jwt:
   access:
     secret: fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a
