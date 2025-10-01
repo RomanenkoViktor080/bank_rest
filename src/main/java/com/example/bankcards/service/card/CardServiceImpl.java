@@ -15,7 +15,6 @@ import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.auth.AuthUserContext;
 import com.example.bankcards.util.crypto.Sha256;
-import com.example.bankcards.util.masker.PanMasker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +34,6 @@ public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final Sha256 sha256;
-    private final PanMasker masker;
     private final UserCardFilterBuilderInterface cardFilterBuilder;
     private final AdminCardFilterBuilderInterface adminCardFilterBuilder;
     private final AuthUserContext authContext;

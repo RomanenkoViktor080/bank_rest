@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.UUID;
 
+@Builder
 @Schema(description = "Request payload for creating a new card (admin only)")
 public record CreateCardDto(
         @Schema(description = "ID of the user who will own the card")

@@ -2,7 +2,9 @@ package com.example.bankcards.dto.card_request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "Payload to process a user card request")
 public record ProcessCardRequestDto(
         @Schema(

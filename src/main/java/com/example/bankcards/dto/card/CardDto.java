@@ -2,11 +2,13 @@ package com.example.bankcards.dto.card;
 
 import com.example.bankcards.entity.card.CardStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Builder
 @Schema(description = "Information about a user card")
 public record CardDto(
         @Schema(description = "Unique identifier of the card", example = "2e0919f1-957b-4db4-b42e-424a35dc18e2")

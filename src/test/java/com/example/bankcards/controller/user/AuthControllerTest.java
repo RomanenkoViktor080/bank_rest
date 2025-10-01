@@ -1,4 +1,4 @@
-package com.example.bankcards.controller;
+package com.example.bankcards.controller.user;
 
 import com.example.bankcards.controller.user.auth.AuthController;
 import com.example.bankcards.dto.auth.JwtTokens;

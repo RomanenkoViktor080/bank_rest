@@ -9,8 +9,8 @@ import lombok.Builder;
 public record JwtTokens(
         @NotBlank
         @Schema(
-                description = "Access token used for authenticating API requests. " +
-                              "Short-lived and must be included in the Authorization header as 'Bearer <token>'",
+                description = "Access token used for authenticating API requests. "
+                              + "Short-lived and must be included in the Authorization header as 'Bearer <token>'",
                 example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         )
         Token accessToken,
