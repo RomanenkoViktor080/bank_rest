@@ -9,6 +9,7 @@ CREATE TABLE cards (
     last_name_snapshot VARCHAR(124) NOT NULL,
     expiry_month SMALLINT NOT NULL,
     expiry_year SMALLINT NOT NULL,
+    deleted_at timestamptz,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );

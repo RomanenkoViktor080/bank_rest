@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 @Schema(description = "Filter criteria for retrieving the authenticated user's cards")
-public record UserCardFilterDto(
+public record CardFilterDto(
         @Schema(
                 description = "Status of the card to filter by"
         )

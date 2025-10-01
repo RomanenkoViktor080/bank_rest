@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -29,6 +31,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE cards SET deleted_at = now() WHERE id=?")
+@SQLRestriction(value = "deleted_at IS NULL")
 @Table(name = "cards")
 public class Card {
     @Id
@@ -63,6 +67,9 @@ public class Card {
 
     @Column(name = "expiry_year", nullable = false)
     private Integer expiryYear;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @CreationTimestamp
     @Column(name = "created_at")

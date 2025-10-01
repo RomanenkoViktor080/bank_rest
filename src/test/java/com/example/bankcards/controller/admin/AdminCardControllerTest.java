@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AdminCardControllerTest {
+    private static final UUID CARD_ID = UUID.randomUUID();
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -56,7 +60,7 @@ public class AdminCardControllerTest {
                 .expiryMonth(12)
                 .build();
         CardDto response = CardDto.builder()
-                .id(UUID.randomUUID())
+                .id(CARD_ID)
                 .balance(BigDecimal.TEN)
                 .build();
         when(cardService.create(request)).thenReturn(response);
@@ -81,6 +85,19 @@ public class AdminCardControllerTest {
         mockMvc.perform(get("/api/v1/admin/cards")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
+                        .with(csrf())
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Test delete user card")
+    @WithMockUser(authorities = "ADMIN")
+    public void testDelete() throws Exception {
+
+        doNothing().when(cardService).delete(CARD_ID);
+        mockMvc.perform(delete("/api/v1/admin/cards/{id}", CARD_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                 )
                 .andExpect(status().isOk());

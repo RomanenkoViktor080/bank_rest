@@ -1,6 +1,6 @@
 package com.example.bankcards.entity.filter.builder.card.user;
 
-import com.example.bankcards.dto.card.UserCardFilterDto;
+import com.example.bankcards.dto.card.CardFilterDto;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.filter.builder.BaseFilterBuilder;
 import com.example.bankcards.entity.filter.filter_item.card.user.UserCardFilterInterface;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class UserCardFilterBuilder extends BaseFilterBuilder<Card, UserCardFilterDto>
+public class UserCardFilterBuilder extends BaseFilterBuilder<Card, CardFilterDto>
         implements UserCardFilterBuilderInterface {
     private final List<UserCardFilterInterface> filters;
 

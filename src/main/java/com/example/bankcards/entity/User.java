@@ -29,7 +29,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE users SET deleted = now() WHERE id=?")
+@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE id=?")
 @SQLRestriction(value = "deleted_at IS NULL")
 @Entity(name = "users")
 public class User implements UserDetails {

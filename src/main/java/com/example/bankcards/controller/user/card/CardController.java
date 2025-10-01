@@ -1,7 +1,7 @@
 package com.example.bankcards.controller.user.card;
 
 import com.example.bankcards.dto.card.CardDto;
-import com.example.bankcards.dto.card.UserCardFilterDto;
+import com.example.bankcards.dto.card.CardFilterDto;
 import com.example.bankcards.service.card.CardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,7 +28,7 @@ public class CardController {
 
     @GetMapping
     public ResponseEntity<Page<CardDto>> get(
-            @ParameterObject @Valid UserCardFilterDto dto,
+            @ParameterObject @Valid CardFilterDto dto,
             @ParameterObject Pageable pageable
     ) {
         return ResponseEntity

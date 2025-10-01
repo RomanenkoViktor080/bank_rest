@@ -3,7 +3,7 @@ package com.example.bankcards.service.card;
 import com.example.bankcards.dto.card.AdminCardFilterDto;
 import com.example.bankcards.dto.card.CardDto;
 import com.example.bankcards.dto.card.CreateCardDto;
-import com.example.bankcards.dto.card.UserCardFilterDto;
+import com.example.bankcards.dto.card.CardFilterDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.card.CardStatus;
@@ -47,7 +47,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Page<CardDto> get(UserCardFilterDto dto, Pageable pageable) {
+    public Page<CardDto> get(CardFilterDto dto, Pageable pageable) {
         UUID userId = authContext.getUserId();
 
         Specification<Card> cardSpecification = cardFilterBuilder.buildSpecification(
@@ -74,5 +74,11 @@ public class CardServiceImpl implements CardService {
         card = cardRepository.save(card);
 
         return cardMapper.toCardDto(card);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        //Добавить аудит, чтобы можно отследить кто удалил
+        cardRepository.deleteById(id);
     }
 }

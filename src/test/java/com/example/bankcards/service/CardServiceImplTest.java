@@ -2,7 +2,7 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.dto.card.AdminCardFilterDto;
 import com.example.bankcards.dto.card.CreateCardDto;
-import com.example.bankcards.dto.card.UserCardFilterDto;
+import com.example.bankcards.dto.card.CardFilterDto;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.filter.builder.card.admin.AdminCardFilterBuilderInterface;
 import com.example.bankcards.entity.filter.builder.card.user.UserCardFilterBuilderInterface;
@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class CardServiceImplTest {
     private static final UUID USER_ID = UUID.randomUUID();
+    private static final UUID CARD_ID = UUID.randomUUID();
 
     @InjectMocks
     private CardServiceImpl service;
@@ -64,7 +65,7 @@ public class CardServiceImplTest {
     private AuthUserContext authContext;
 
     @Captor
-    ArgumentCaptor<UserCardFilterDto> userFilterCaptor;
+    ArgumentCaptor<CardFilterDto> userFilterCaptor;
     @Captor
     ArgumentCaptor<AdminCardFilterDto> adminFilterCaptor;
     @Captor
@@ -93,13 +94,13 @@ public class CardServiceImplTest {
     @DisplayName("Should return user's paginated and filtered card list")
     @Test
     public void shouldReturnFilteredPaginatedUserCards() {
-        UserCardFilterDto dto = mock(UserCardFilterDto.class);
+        CardFilterDto dto = mock(CardFilterDto.class);
         Pageable pageable = mock(Pageable.class);
         Specification<Card> specification = mock(Specification.class);
         Page<Card> page = mock(Page.class);
 
         when(authContext.getUserId()).thenReturn(USER_ID);
-        when(cardFilterBuilder.buildSpecification(any(UserCardFilterDto.class), any())).thenReturn(specification);
+        when(cardFilterBuilder.buildSpecification(any(CardFilterDto.class), any())).thenReturn(specification);
         when(cardRepository.findAll(specification, pageable)).thenReturn(page);
 
         service.get(dto, pageable);
@@ -134,5 +135,14 @@ public class CardServiceImplTest {
         verify(cardCreationPolicy, times(1)).validate(dto, isExists);
         verify(cardMapper, times(1)).toCard(eq(dto), eq(hash), any());
         verify(cardRepository, times(1)).save(any());
+    }
+
+
+    @DisplayName("Should soft-delete card")
+    @Test
+    public void shouldSoftDeleteCard() {
+        service.delete(CARD_ID);
+
+        verify(cardRepository, times(1)).deleteById(CARD_ID);
     }
 }

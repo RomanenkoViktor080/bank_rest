@@ -84,7 +84,7 @@ public class TransactionServiceImplTest {
 
     @DisplayName("transfer: create new transaction and update balances when no existing transaction")
     @Test
-    void transfer_createsTransactionAndUpdatesBalances_whenNoExistingTransaction() {
+    void testSuccessfulTransfer() {
         TransferRequestDto dto = new TransferRequestDto(fromCardId, toCardId, AMOUNT, IDEMPOTENCY_KEY);
 
         CardDto fromDto = new CardDto(fromCardId, "**** **** **** 1111", CardStatus.ACTIVE,
@@ -112,7 +112,7 @@ public class TransactionServiceImplTest {
 
     @DisplayName("transfer: return existing transaction when idempotency transaction exists and matches")
     @Test
-    void transfer_returnsExisting_whenTransactionMatches() {
+    void testFindSuccessfulSameTransferTransactionByIdempotencyKey() {
         TransferRequestDto dto = new TransferRequestDto(fromCardId, toCardId, AMOUNT, IDEMPOTENCY_KEY);
         CardDto fromDto = new CardDto(fromCardId, "**** **** **** 1111", CardStatus.ACTIVE, FROM_CARD_BALANCE,
                 "First", "Last", 12, 2028, LocalDateTime.now());
@@ -147,7 +147,7 @@ public class TransactionServiceImplTest {
 
     @DisplayName("test conflict when existing transaction has different params")
     @Test
-    void testConflictWhenExistingTransactionHasDifferentParams() {
+    void testFindSuccessfulAnotherTransferTransactionByIdempotencyKey() {
         BigDecimal existingAmount = BigDecimal.valueOf(10);
 
         TransferRequestDto dto = new TransferRequestDto(fromCardId, toCardId, AMOUNT, IDEMPOTENCY_KEY);
