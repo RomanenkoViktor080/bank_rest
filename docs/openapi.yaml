@@ -1,1 +1,861 @@
 # Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.1.0
+info:
+  title: Bank cards API
+  version: v1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - bearer-jwt: []
+tags:
+  - name: Admin Card Management
+    description: >-
+      APIs for administrators to manage user bank cards. Includes operations for
+      creating, blocking, activating and deleting cards
+  - name: Admin Card Requests
+    description: >-
+      APIs for administrators to view and process user requests related to bank
+      cards, such as blocking, unblocking, or other actions
+  - name: Authentication
+    description: Endpoints for user registration, login, token refresh
+  - name: User management
+    description: Endpoints for managing users by administrators
+  - name: User Card Management
+    description: >-
+      APIs for regular users to view and manage their own bank cards. Supports
+      listing cards
+  - name: User Card Requests
+    description: >-
+      APIs for users to create and manage requests related to their own bank
+      cards, such as blocking, unblocking, replacement, or other actions
+  - name: User Transactions
+    description: >-
+      APIs for users to perform financial operations such as transfers between
+      their own cards
+paths:
+  /api/v1/admin/users/{id}/ban:
+    put:
+      tags:
+        - User management
+      operationId: ban
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+  /api/v1/admin/requests/{id}:
+    put:
+      tags:
+        - Admin Card Requests
+      summary: Process a user card request
+      description: Approve or reject a specific card request submitted by a user
+      operationId: process
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessCardRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardRequestDto'
+  /api/v1/transactions/transfer:
+    post:
+      tags:
+        - User Transactions
+      summary: Transfer funds between user's cards
+      description: >-
+        Perform a transfer between two cards owned by the authenticated user.
+        Both the source and target cards must belong to the user, be active.
+      operationId: transfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransferResponseDto'
+  /api/v1/transactions/deposit/{cardId}:
+    post:
+      tags:
+        - User Transactions
+      summary: Deposit funds to a card (test only)
+      description: >-
+        Add funds to a user's card. This endpoint is intended for testing and
+        demo purposes only. The card must belong to the authenticated user and
+        must be active.
+      operationId: deposit
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransactionResponseDto'
+  /api/v1/requests/block:
+    post:
+      tags:
+        - User Card Requests
+      operationId: transfer_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockCardRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardRequestDto'
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      description: Creates a new user and returns an access token
+      operationId: signUp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+        required: true
+      responses:
+        '201':
+          description: >-
+            User successfully registered. Returns an access token and sets an
+            HttpOnly cookie with the refresh token
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '403':
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+  /api/v1/auth/refresh-token:
+    post:
+      tags:
+        - Authentication
+      summary: Obtain a new access token
+      description: >-
+        Returns a new access token based on the refresh token stored in an
+        HttpOnly cookie
+      operationId: refreshToken
+      parameters:
+        - name: refresh_token
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A new access token and its expiration time
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '403':
+          description: Refresh token not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User authentication
+      description: Validates username and password and returns an access token
+      operationId: signIn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInRequest'
+        required: true
+      responses:
+        '200':
+          description: >-
+            Successful authentication. Returns an access token and sets an
+            HttpOnly cookie with the refresh token
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '403':
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+  /api/v1/admin/cards:
+    get:
+      tags:
+        - Admin Card Management
+      summary: Get all user cards
+      description: Retrieve a paginated list of all cards in the system
+      operationId: get
+      parameters:
+        - name: status
+          in: query
+          description: Status of the card to filter by
+          required: false
+          schema:
+            type: string
+            description: Status of the card to filter by
+            enum:
+              - ACTIVE
+              - BLOCKED
+              - EXPIRED
+        - name: userId
+          in: query
+          description: Filter cards by owner user ID
+          required: false
+          schema:
+            type: string
+            format: uuid
+            description: Filter cards by owner user ID
+            example: d290f1ee-6c54-4b01-90e6-d701748f0851
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        - name: page
+          in: query
+          description: Zero-based page index (0..N)
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: The size of the page to be returned
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+        - name: sort
+          in: query
+          description: >-
+            Sorting criteria in the format: property,(asc|desc). Default sort
+            order is ascending. Multiple sort criteria are supported.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageCardDto'
+    post:
+      tags:
+        - Admin Card Management
+      summary: Create a card for a user
+      description: Create a new bank card for a specified user
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+  /api/v1/cards:
+    get:
+      tags:
+        - User Card Management
+      operationId: get_1
+      parameters:
+        - name: status
+          in: query
+          description: Status of the card to filter by
+          required: false
+          schema:
+            type: string
+            description: Status of the card to filter by
+            enum:
+              - ACTIVE
+              - BLOCKED
+              - EXPIRED
+        - name: page
+          in: query
+          description: Zero-based page index (0..N)
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: The size of the page to be returned
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+        - name: sort
+          in: query
+          description: >-
+            Sorting criteria in the format: property,(asc|desc). Default sort
+            order is ascending. Multiple sort criteria are supported.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageCardDto'
+  /api/v1/admin/users:
+    get:
+      tags:
+        - User management
+      summary: Get paginated and filtered list of users
+      description: Retrieve a paginated list of users with optional filtering
+      operationId: get_2
+      parameters:
+        - name: search
+          in: query
+          description: >-
+            Search keyword to filter users ( by username, email, or name. Only
+            username for now)
+          required: false
+          schema:
+            type: string
+            description: >-
+              Search keyword to filter users ( by username, email, or name. Only
+              username for now)
+            example: john
+          example: john
+        - name: page
+          in: query
+          description: Zero-based page index (0..N)
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: The size of the page to be returned
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+        - name: sort
+          in: query
+          description: >-
+            Sorting criteria in the format: property,(asc|desc). Default sort
+            order is ascending. Multiple sort criteria are supported.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageUserDto'
+  /api/v1/admin/requests:
+    get:
+      tags:
+        - Admin Card Requests
+      summary: Get all card requests
+      description: Retrieve a paginated list of all card requests
+      operationId: get_3
+      parameters:
+        - name: status
+          in: query
+          description: Status of the card request to filter by
+          required: false
+          schema:
+            type: string
+            description: Status of the card request to filter by
+            enum:
+              - PENDING
+              - APPROVED
+              - REJECTED
+        - name: page
+          in: query
+          description: Zero-based page index (0..N)
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: The size of the page to be returned
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+        - name: sort
+          in: query
+          description: >-
+            Sorting criteria in the format: property,(asc|desc). Default sort
+            order is ascending. Multiple sort criteria are supported.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageCardRequestDto'
+  /api/v1/admin/cards/{id}:
+    delete:
+      tags:
+        - Admin Card Management
+      summary: Delete a card (admin only)
+      description: Soft-delete a card by its ID
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        isBanned:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    ProcessCardRequestDto:
+      type: object
+      description: Payload to process a user card request
+      properties:
+        status:
+          type: string
+          description: 'Decision for the card request: APPROVE to accept, REJECT to deny'
+          enum:
+            - APPROVE
+            - REJECT
+      required:
+        - status
+    CardDto:
+      type: object
+      description: Information about a user card
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the card
+          example: 2e0919f1-957b-4db4-b42e-424a35dc18e2
+        maskedPan:
+          type: string
+          description: Masked PAN of the card for security
+          example: '**** **** **** 1234'
+        status:
+          type: string
+          description: Current status of the card
+          enum:
+            - ACTIVE
+            - BLOCKED
+            - EXPIRED
+        balance:
+          type: number
+          description: Current balance of the card
+          example: 1000.5
+        firstNameSnapshot:
+          type: string
+          description: First name of the card owner (snapshot at card creation)
+          example: John
+        lastNameSnapshot:
+          type: string
+          description: Last name of the card owner
+          example: Doe
+        expiryMonth:
+          type: integer
+          format: int32
+          description: Expiry month of the card
+          example: 12
+        expiryYear:
+          type: integer
+          format: int32
+          description: Expiry year of the card
+          example: 34
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the card was created
+    CardRequestDto:
+      type: object
+      description: Information about a card request
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the card request
+        status:
+          type: string
+          description: Current status of the request
+          enum:
+            - PENDING
+            - APPROVED
+            - REJECTED
+        card:
+          $ref: '#/components/schemas/CardDto'
+          description: Information about the card associated with this request
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the request was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the request was last updated
+    TransferRequestDto:
+      type: object
+      properties:
+        fromCardId:
+          type: string
+          format: uuid
+        toCardId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        idempotencyKey:
+          type: string
+    TransferResponseDto:
+      type: object
+      properties:
+        fromCard:
+          $ref: '#/components/schemas/CardDto'
+        toCard:
+          $ref: '#/components/schemas/CardDto'
+        dateTime:
+          type: string
+          format: date-time
+    DepositRequestDto:
+      type: object
+      properties:
+        amount:
+          type: number
+        idempotencyKey:
+          type: string
+    TransactionResponseDto:
+      type: object
+      properties:
+        amount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+    BlockCardRequestDto:
+      type: object
+      description: Request payload to block a user's card
+      properties:
+        cardId:
+          type: string
+          format: uuid
+          description: ID of the card to be blocked
+        idempotencyKey:
+          type: string
+          description: Idempotency key to ensure the request is processed only once
+      required:
+        - cardId
+        - idempotencyKey
+    SignUpRequest:
+      type: object
+      description: Request payload for user registration
+      properties:
+        username:
+          type: string
+          description: Desired username for the new user
+          example: john
+          minLength: 1
+        password:
+          type: string
+          description: Password for the new user
+          example: P@ssw0rd123
+          minLength: 1
+      required:
+        - password
+        - username
+    ResponseToken:
+      type: object
+      description: Contains the access token and its expiration information
+      properties:
+        value:
+          type: string
+          description: JWT token used for authorization
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          minLength: 1
+        expireAt:
+          type: string
+          format: date-time
+          description: Date and time when the token will expire (ISO-8601 format)
+          example: '2025-07-15T12:34:56'
+          minLength: 1
+      required:
+        - expireAt
+        - value
+    SignInRequest:
+      type: object
+      description: Request payload for user authentication
+      properties:
+        username:
+          type: string
+          description: Username of the user attempting to authenticate
+          example: john
+          minLength: 1
+        password:
+          type: string
+          description: Password of the user
+          example: P@ssw0rd123
+          minLength: 1
+      required:
+        - password
+        - username
+    CreateCardDto:
+      type: object
+      description: Request payload for creating a new card (admin only)
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: ID of the user who will own the card
+        pan:
+          type: string
+          description: Primary Account Number (PAN) of the card
+          example: 4242424242424242
+        firstNameSnapshot:
+          type: string
+          description: First name of the card owner (snapshot at creation)
+          example: John
+        lastNameSnapshot:
+          type: string
+          description: Last name of the card owner (snapshot at creation)
+          example: Doe
+        expiryMonth:
+          type: integer
+          format: int32
+          description: Expiry month of the card (1-12)
+          example: 12
+          maximum: 12
+          minimum: 1
+        expiryYear:
+          type: integer
+          format: int32
+          description: Expiry year of the card
+          example: 34
+      required:
+        - expiryMonth
+        - expiryYear
+        - firstNameSnapshot
+        - lastNameSnapshot
+        - userId
+    PageCardDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        empty:
+          type: boolean
+        unsorted:
+          type: boolean
+    PageUserDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageCardRequestDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardRequestDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        empty:
+          type: boolean
+  securitySchemes:
+    bearer-jwt:
+      type: http
+      name: Authorization
+      in: header
+      scheme: bearer
+      bearerFormat: JWT

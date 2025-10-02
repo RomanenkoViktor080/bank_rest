@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/migrations/changeset/V001__initial.sql
+  - include:
+      file: db/migrations/changeset/V002__cards.sql
