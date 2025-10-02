@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
     Optional<User> findByUsername(String username);
 
+    boolean existsByUsername(String username);
+
     default User findByIdOrThrow(UUID uuid) {
         return findById(uuid).orElseThrow(() -> new EntityNotFoundException(
                 "User not found",

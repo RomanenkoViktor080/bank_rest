@@ -1,10 +1,12 @@
-#todo вынести в env
 spring:
+  admin:
+    username: ${ADMIN_USERNAME:root}
+    password: ${ADMIN_PASSWORD:root}
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: user
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -17,30 +19,15 @@ spring:
   liquibase:
     change-log: classpath:db/migrations/db.changelog-master.yaml
 
-  data:
-    redis:
-      port: 6379
-      host: localhost
-
 server:
   port: 8080
 
 hmac:
-  key: 6B3f4pJZ1aY8fR4+zTqJY1C0JQ8Fn+2kjkFq8R9bN7g=
+  key: ${HMAC_KEY:6B3f4pJZ1aY8fR4+zTqJY1C0JQ8Fn+2kjkFq8R9bN7g=}
 jwt:
   access:
-    secret: fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a
-    expiration: 600000
+    secret: ${JWT_ACCESS_SECRET:fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a}
+    expiration: ${JWT_ACCESS_EXPIRATION:600000}
   refresh:
-    secret: fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a
-    expiration: 604800000
-
-
-##
-## application.yml — главный конфигурационный файл Spring Boot.
-#
-#Что нужно сделать:
-#  - Указать настройки подключения к базе данных.
-#  - Указать порт приложения.
-#  - Настроить параметры безопасности и JWT.
-#  - Включить Swagger UI.
+    secret: ${JWT_REFRESH_SECRET:fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a}
+    expiration: ${JWT_REFRESH_EXPIRATION:604800000}
